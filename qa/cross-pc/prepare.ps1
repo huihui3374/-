@@ -9,6 +9,7 @@ $zip = Join-Path $qaRoot 'published.zip'
 if ($Stage -eq 'download') {
     Write-Host 'Fetching live published application metadata (30 second timeout)'
     $release = (Invoke-RestMethod 'https://chengjingshop.top/api/applications' -Headers @{'User-Agent'='Chengjing-QA/1.0'} -TimeoutSec 30).applications | Where-Object { $_.id -eq 'chengjing-connect' }
+    Write-Host ('Observed public release: ' + ($release | ConvertTo-Json -Depth 6 -Compress))
     if ($release.version -ne '0.14.0-retail.2' -or $release.package.sha256 -ne '96db1dbbb6361e71e29d326d91094812611bbd206ef42b21dd13d45f2407b5f0' -or $release.package.bytes -ne 167057848) { throw 'Published package changed; refresh the reviewed test input first' }
     Write-Host 'Metadata matched; fetching advertised HTTP ranges with bounded concurrency'
     & node qa/cross-pc/range-download.mjs $release.downloadUrl $zip
