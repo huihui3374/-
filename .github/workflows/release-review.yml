@@ -1,0 +1,36 @@
+name: Free installer lifecycle review
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'qa/release-review/**'
+      - '.github/workflows/release-review.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  review:
+    if: github.event.repository.private == false
+    runs-on: windows-2025
+    timeout-minutes: 10
+    env:
+      GITHUB_REPOSITORY_VISIBILITY: ${{ github.event.repository.visibility }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+      - name: Download exact current public installer with verified ranges
+        timeout-minutes: 5
+        shell: pwsh
+        run: ./qa/cross-pc/prepare.ps1 download
+      - name: Verify current installer hash and install it
+        timeout-minutes: 3
+        shell: pwsh
+        run: ./qa/cross-pc/prepare.ps1 extract
+      - name: Inspect signature, overwrite, uninstall and reinstall default profile
+        timeout-minutes: 5
+        shell: pwsh
+        run: node qa/release-review/installed-review.mjs

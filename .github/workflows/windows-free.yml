@@ -12,7 +12,7 @@ env:
   GITHUB_REPOSITORY_VISIBILITY: ${{ github.event.repository.visibility }}
 jobs:
   first:
-    if: github.event.repository.private == false
+    if: github.event.repository.private == false && !contains(github.event.head_commit.message, '[review-only]')
     runs-on: windows-2022
     timeout-minutes: 15
     outputs:
@@ -49,7 +49,7 @@ jobs:
         run: node qa/cross-pc/report.mjs first
   second:
     needs: first
-    if: github.event.repository.private == false
+    if: github.event.repository.private == false && !contains(github.event.head_commit.message, '[review-only]')
     runs-on: windows-2025
     timeout-minutes: 15
     steps:
