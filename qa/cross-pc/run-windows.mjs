@@ -8,12 +8,14 @@ import {spawnSync} from 'node:child_process';
 import {createRequire} from 'node:module';
 import {pathToFileURL} from 'node:url';
 import {createFixture} from './protocol-fixture.mjs';
+import {createHash} from 'node:crypto';
 
 assert.equal(process.platform,'win32','This acceptance run requires a fresh Windows VM');
 const phase=process.argv[2],root=process.env.QA_ROOT,exe=process.env.QA_EXE,appRoot=path.join(path.dirname(exe),'resources/app'),out=path.join(root,'reports'),handoff=path.join(root,'handoff'),profile=path.join(root,'profile-'+phase),workspace=path.join(root,'授权文件夹 with spaces');
 await fs.mkdir(out,{recursive:true});await fs.mkdir(workspace,{recursive:true});await fs.mkdir(handoff,{recursive:true});
 const download=JSON.parse(await fs.readFile(path.join(root,'download-evidence.json')));
-const report={phase,download,host:os.hostname(),windowsRelease:os.release(),architecture:os.arch(),version:'0.14.0-retail.2',checks:[],passed:false,realCustomersUsed:false,realPaymentsMade:false,productionConfigurationChanged:false,testLicenseService:'public disposable protocol simulator, NOT production backend',membershipPolicyProof:'reviewed production backend tested separately in private local environment'};
+const installation=JSON.parse((await fs.readFile(path.join(root,'installation-evidence.json'),'utf8')).replace(/^\uFEFF/,''));
+const report={phase,download,installation,host:os.hostname(),windowsRelease:os.release(),architecture:os.arch(),version:'0.14.0-retail.2',checks:[],passed:false,realCustomersUsed:false,realPaymentsMade:false,productionConfigurationChanged:false,testLicenseService:'public disposable protocol simulator, NOT production backend',membershipPolicyProof:'reviewed production backend tested separately in private local environment'};
 const mark=name=>{report.checks.push(name);console.log('PASS '+name)};
 const clean=s=>String(s).replace(/https:\/\/[^\s"']*trycloudflare\.com[^\s"']*/g,'[private test connection]').replace(/\/mcp\/[A-Za-z0-9_-]+/g,'/mcp/[hidden]').replace(/Bearer\s+[A-Za-z0-9_-]+/g,'Bearer [hidden]');
 const save=()=>fs.writeFile(path.join(out,phase+'.json'),JSON.stringify(report,null,2));
@@ -35,6 +37,9 @@ async function approved(name,args,decision='once'){
  const end=Date.now()+20000;while(Date.now()<end){const job=data(await client.callTool({name:'get_job',arguments:{job_id:t.job_id}}));if(['completed','rejected','failed','cancelled'].includes(job.status)){assert.equal(job.status,decision==='reject'?'rejected':'completed');return job}await new Promise(r=>setTimeout(r,100))}throw Error('Original approved job timed out')
 }
 try{
+ const expected=JSON.parse(await fs.readFile(new URL('./public-source-hashes.json',import.meta.url)));
+ for(const [name,hash] of Object.entries(expected))assert.equal(createHash('sha256').update(await fs.readFile(path.join(appRoot,name))).digest('hex'),hash,'Installed program source differs: '+name);
+ report.reviewedSourceFiles=Object.keys(expected).length;mark('actual installer installs the reviewed production application source unchanged');
  const check=spawnSync(exe,['--retail-self-check'],{encoding:'utf8',timeout:45000,env:{...process.env,CHENGJING_PROFILE_DIR:path.join(root,'pristine-self-check')}});assert.equal(check.status,0,'Pristine production package self-check failed: '+clean(check.stderr));const proof=JSON.parse(check.stdout.trim().split(/\r?\n/).find(l=>l.startsWith('{')));assert(proof.retailSelfCheck&&proof.pinnedServiceKey&&proof.windowsCredentialEncryption);assert.equal(proof.version,report.version);mark('pristine published executable, production service key and Windows DPAPI');
  if(phase==='second'){
   const prior=JSON.parse(await fs.readFile(path.join(process.env.QA_HANDOFF,'first-machine.json')));

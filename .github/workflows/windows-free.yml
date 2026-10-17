@@ -28,7 +28,7 @@ jobs:
         timeout-minutes: 5
         shell: pwsh
         run: ./qa/cross-pc/prepare.ps1 download
-      - name: Verify checksum and extract the published executable
+      - name: Verify installer checksum and perform actual silent installation
         timeout-minutes: 3
         shell: pwsh
         run: ./qa/cross-pc/prepare.ps1 extract
@@ -63,7 +63,7 @@ jobs:
         timeout-minutes: 5
         shell: pwsh
         run: ./qa/cross-pc/prepare.ps1 download
-      - name: Verify checksum and extract the published executable
+      - name: Verify installer checksum and perform actual silent installation
         timeout-minutes: 3
         shell: pwsh
         run: ./qa/cross-pc/prepare.ps1 extract

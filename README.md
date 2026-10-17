@@ -2,9 +2,9 @@
 
 This repository contains **only disposable public QA scripts**. It does not contain
 the merchant backend, merchant credentials, customer data or production signing keys.
-The client ZIP is downloaded from its existing public storefront URL using its advertised HTTP byte-range support, then reassembled and checked in full. It is pinned to
+The current public EXE installer is downloaded from its existing public storefront URL using its advertised HTTP byte-range support, then reassembled and checked in full; the detected Inno/NSIS installer is actually run on the disposable VM. It is pinned to
 version `0.14.0-retail.2`, SHA-256
-`96db1dbbb6361e71e29d326d91094812611bbd206ef42b21dd13d45f2407b5f0`.
+`78d931935a54855f28d0f6b5507783ecd5b4bdd3ada740e65b6fc8e89a9fe9f2`.
 
 ## Zero-cost configuration
 
@@ -19,7 +19,7 @@ there is no billable artifact storage. Each job has a 15-minute timeout.
 
 ## What the Windows jobs prove
 
-* Downloaded archive integrity, packaged Electron launch in a Chinese/spaces path,
+* Current installer integrity, actual silent installation, installed source hashes, packaged Electron launch in a Chinese/spaces path,
   original production-service key self-check and real Windows DPAPI support.
 * Renderer isolation, login UI, password field behaviour and member gate.
 * Actual bundled MCP listener/tunnel, PowerShell identity, permission enforcement,
