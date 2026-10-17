@@ -1,0 +1,43 @@
+{
+  "version": "0.14.0-retail.2",
+  "windows": "win32",
+  "checks": [
+    "fresh launch creates a real default Windows profile and encrypted device identity",
+    "same-version overwrite installation retains default encrypted identity, preferences and workspace files",
+    "after overwrite, actual program launches with the same default workspace and device identity",
+    "uninstall removes executable and keeps default user profile and workspace files",
+    "reinstall after uninstall restores launch without replacing the encrypted device identity"
+  ],
+  "passed": true,
+  "productionAccountsChanged": false,
+  "productionPaymentsMade": false,
+  "authenticode": [
+    {
+      "status": "NotSigned",
+      "file": "published-setup.exe",
+      "hasSigningCertificate": false
+    },
+    {
+      "status": "NotSigned",
+      "file": "Chengjing-Retail.exe",
+      "hasSigningCertificate": false
+    }
+  ],
+  "uninstallRegistration": [
+    {
+      "hive": "HKCU",
+      "publisher": "澄镜",
+      "displayName": "澄镜本地连接（会员版）",
+      "displayVersion": "0.14.0-retail.2",
+      "hasUninstallCommand": true
+    }
+  ],
+  "defaultProfileReady": true,
+  "uninstall": {
+    "exitCode": 0,
+    "programRemoved": true,
+    "defaultProfileRetained": true,
+    "encryptedDeviceIdentityRetained": true,
+    "workspaceFileRetained": true
+  }
+}

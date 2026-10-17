@@ -55,3 +55,13 @@
 使用公开仓库的标准 Windows runner，未使用私有仓库分钟、付费大型 runner、Actions 制品上传或缓存，没有开通付费云服务。本轮新增运行费为 0。
 
 原始脱敏结果：[第一台](windows-first.json)、[第二台](windows-second.json)。完整步骤、原生程序自检和测试输出可在上方 GitHub 运行记录查看。
+
+
+## 安装器补充验收（2026-10-18）
+
+[运行 39074395369](https://github.com/huihui3374/-/actions/runs/39074395369) 在另一台干净 Windows Server 2025 中完成，结果通过：[原始结果](installer-lifecycle.json)。
+
+- 当前 EXE 支持本轮的按用户安装，HKCU 中存在正确的卸载记录。
+- 使用程序真实默认 AppData 配置目录，确认同版本覆盖安装、卸载、重装后设备加密资料和工作文件得到保留，重装后能够启动。没有以自定义测试配置目录替代默认资料目录。
+- 安装器和主程序的 Windows Authenticode 状态均为 `NotSigned`；测试没有验证普通下载后的 SmartScreen 信誉提示。不能把云端功能测试通过理解为具备 Windows 数字签名或杀毒软件全覆盖认证。
+- 本轮没有使用或修改真实客户账号、会员时长或付款记录。
