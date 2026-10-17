@@ -10,11 +10,9 @@ if ($Stage -eq 'download') {
     Write-Host 'Fetching live published application metadata (30 second timeout)'
     $release = (Invoke-RestMethod 'https://chengjingshop.top/api/applications' -Headers @{'User-Agent'='Chengjing-QA/1.0'} -TimeoutSec 30).applications | Where-Object { $_.id -eq 'chengjing-connect' }
     if ($release.version -ne '0.14.0-retail.2' -or $release.package.sha256 -ne '96db1dbbb6361e71e29d326d91094812611bbd206ef42b21dd13d45f2407b5f0' -or $release.package.bytes -ne 167057848) { throw 'Published package changed; refresh the reviewed test input first' }
-    Write-Host 'Metadata matched; streaming 167057848 byte ZIP with native curl (150 second total timeout)'
-    & curl.exe --fail --location --connect-timeout 15 --max-time 150 --speed-limit 16384 --speed-time 30 --output $zip --write-out 'HTTP %{http_code}; bytes %{size_download}; seconds %{time_total}; bytes/sec %{speed_download}' $release.downloadUrl
-    $downloadExit = $LASTEXITCODE
-    if (Test-Path $zip) { Write-Host "Local ZIP bytes: $((Get-Item $zip).Length)" }
-    if ($downloadExit -ne 0) { throw "Published installer download failed, curl exit $downloadExit" }
+    Write-Host 'Metadata matched; fetching advertised HTTP ranges with bounded concurrency'
+    & node qa/cross-pc/range-download.mjs $release.downloadUrl $zip
+    if ($LASTEXITCODE -ne 0) { throw 'Verified range download failed' }
     if ((Get-Item $zip).Length -ne 167057848) { throw 'Published archive size mismatch' }
     Write-Host 'Download completed'
 } elseif ($Stage -eq 'extract') {

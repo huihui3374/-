@@ -2,7 +2,7 @@
 
 This repository contains **only disposable public QA scripts**. It does not contain
 the merchant backend, merchant credentials, customer data or production signing keys.
-The client ZIP is downloaded from its existing public storefront URL and pinned to
+The client ZIP is downloaded from its existing public storefront URL using its advertised HTTP byte-range support, then reassembled and checked in full. It is pinned to
 version `0.14.0-retail.2`, SHA-256
 `96db1dbbb6361e71e29d326d91094812611bbd206ef42b21dd13d45f2407b5f0`.
 
