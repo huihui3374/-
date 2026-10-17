@@ -1,0 +1,44 @@
+{
+  "phase": "first",
+  "download": {
+    "publicInstaller": true,
+    "transport": "advertised HTTP byte ranges",
+    "bytes": 116968751,
+    "sha256": "78d931935a54855f28d0f6b5507783ecd5b4bdd3ada740e65b6fc8e89a9fe9f2",
+    "elapsedMs": 10744
+  },
+  "installation": {
+    "installedInChinesePath": true,
+    "engine": "Inno Setup",
+    "exitCode": 0
+  },
+  "host": "runnervmgnbhw",
+  "windowsRelease": "10.0.20348",
+  "architecture": "x64",
+  "version": "0.14.0-retail.2",
+  "checks": [
+    "actual installer installs the reviewed production application source unchanged",
+    "pristine published executable, production service key and Windows DPAPI",
+    "clean packaged first launch, isolated renderer, 8-character password and no-member connection denial",
+    "client login and device binding against synthetic protocol simulator",
+    "client accepts initial seven-day lease and thirty-day renewal from simulator",
+    "real packaged MCP listener and bundled Cloudflare process start",
+    "MCP initialize, catalog, current instance, verification code and PowerShell identity",
+    "terminal denied before user grants permissions",
+    "approved file work persists; rejected work never executes",
+    "actual Windows command stdout and nonzero exit code read back",
+    "independent Edge browser opens, fills, clicks, persists session and screenshots",
+    "real public HTTPS tunnel MCP check",
+    "expired membership blocks new operations and an earlier approval cannot bypass expiry",
+    "disconnect stops local connection"
+  ],
+  "passed": true,
+  "realCustomersUsed": false,
+  "realPaymentsMade": false,
+  "productionConfigurationChanged": false,
+  "testLicenseService": "public disposable protocol simulator, NOT production backend",
+  "membershipPolicyProof": "reviewed production backend tested separately in private local environment",
+  "reviewedSourceFiles": 28,
+  "publicMcpReachable": true,
+  "screenshotSha256": "7994d8b87535a327f8dc943901413979c80c6d428e64fab1caa9d5b4a7389b70"
+}

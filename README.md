@@ -1,3 +1,5 @@
+**Latest completed acceptance:** [both independent Windows machines passed](results/README.md), run [39073437328](https://github.com/huihui3374/-/actions/runs/39073437328).
+
 # 澄镜 — free independent Windows acceptance
 
 This repository contains **only disposable public QA scripts**. It does not contain
