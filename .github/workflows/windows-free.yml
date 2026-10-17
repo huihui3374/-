@@ -1,0 +1,67 @@
+name: Free public Windows acceptance
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: free-retail-cross-pc
+  cancel-in-progress: false
+env:
+  GITHUB_REPOSITORY_VISIBILITY: ${{ github.event.repository.visibility }}
+jobs:
+  first:
+    if: github.event.repository.private == false
+    runs-on: windows-2022
+    timeout-minutes: 15
+    outputs:
+      handoff: ${{ steps.handoff.outputs.data }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+      - name: Verify public package and prepare disposable test copy
+        shell: pwsh
+        run: ./qa/cross-pc/prepare.ps1
+      - name: Run first independent Windows acceptance
+        shell: pwsh
+        run: node qa/cross-pc/run-windows.mjs first
+      - name: Pass small synthetic state directly through job outputs
+        id: handoff
+        shell: pwsh
+        run: node qa/cross-pc/handoff.mjs export
+      - name: Write evidence to free job log and summary
+        if: always()
+        shell: pwsh
+        run: node qa/cross-pc/report.mjs first
+  second:
+    needs: first
+    if: github.event.repository.private == false
+    runs-on: windows-2025
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+      - name: Independently download and verify the same release
+        shell: pwsh
+        run: ./qa/cross-pc/prepare.ps1
+      - name: Import only synthetic protocol state and encrypted test profile
+        shell: pwsh
+        env:
+          QA_HANDOFF_DATA: ${{ needs.first.outputs.handoff }}
+        run: node qa/cross-pc/handoff.mjs import
+      - name: Run second independent Windows acceptance
+        shell: pwsh
+        run: node qa/cross-pc/run-windows.mjs second
+      - name: Write evidence to free job log and summary
+        if: always()
+        shell: pwsh
+        run: node qa/cross-pc/report.mjs second
