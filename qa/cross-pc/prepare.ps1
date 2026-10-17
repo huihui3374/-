@@ -30,14 +30,25 @@ if ($Stage -eq 'download') {
     "QA_EXE=$($exe.FullName)" | Out-File $env:GITHUB_ENV -Encoding utf8 -Append
     Write-Host 'Published executable extracted and pinned checksum verified'
 } elseif ($Stage -eq 'certificate') {
-    Write-Host 'Creating disposable localhost test CA only on this ephemeral Windows runner'
-    $certificate = New-SelfSignedCertificate -DnsName 'localhost' -CertStoreLocation 'Cert:\CurrentUser\My' -KeyExportPolicy Exportable -NotAfter (Get-Date).AddDays(2)
-    $cer = Join-Path $qaRoot 'qa-localhost.cer'
-    Export-Certificate -Cert $certificate -FilePath $cer | Out-Null
-    Import-Certificate -FilePath $cer -CertStoreLocation 'Cert:\CurrentUser\Root' | Out-Null
-    $password = ConvertTo-SecureString 'QA-only-ephemeral-certificate' -AsPlainText -Force
-    Export-PfxCertificate -Cert $certificate -FilePath (Join-Path $qaRoot 'qa-localhost.pfx') -Password $password | Out-Null
-    $pem = "-----BEGIN CERTIFICATE-----`n" + [Convert]::ToBase64String($certificate.RawData,[Base64FormattingOptions]::InsertLineBreaks) + "`n-----END CERTIFICATE-----`n"
-    $pem | Set-Content -Encoding ascii (Join-Path $qaRoot 'qa-localhost.pem')
+    Write-Host 'Generating disposable localhost TLS fixture with in-memory .NET cryptography'
+    $rsa = [System.Security.Cryptography.RSA]::Create(2048)
+    $request = [System.Security.Cryptography.X509Certificates.CertificateRequest]::new('CN=localhost', $rsa, [System.Security.Cryptography.HashAlgorithmName]::SHA256, [System.Security.Cryptography.RSASignaturePadding]::Pkcs1)
+    $san = [System.Security.Cryptography.X509Certificates.SubjectAlternativeNameBuilder]::new()
+    $san.AddDnsName('localhost')
+    $request.CertificateExtensions.Add($san.Build())
+    $certificate = $request.CreateSelfSigned([DateTimeOffset]::UtcNow.AddMinutes(-5), [DateTimeOffset]::UtcNow.AddDays(2))
+    [System.IO.File]::WriteAllBytes((Join-Path $qaRoot 'qa-localhost.pfx'), $certificate.Export([System.Security.Cryptography.X509Certificates.X509ContentType]::Pfx, 'QA-only-ephemeral-certificate'))
+    $certificate.ExportCertificatePem() | Set-Content -Encoding ascii (Join-Path $qaRoot 'qa-localhost.pem')
+    Write-Host 'Fixture PFX/PEM generated; trusting public test certificate on ephemeral runner only'
+    # CurrentUser Root import can open an interactive Windows security dialog.
+    # The disposable hosted runner is administrator-owned; machine-store insertion
+    # avoids that UI and fails explicitly if the runner does not grant access.
+    $store = [System.Security.Cryptography.X509Certificates.X509Store]::new('Root', 'LocalMachine')
+    try {
+        $store.Open([System.Security.Cryptography.X509Certificates.OpenFlags]::ReadWrite)
+        $publicCertificate = [System.Security.Cryptography.X509Certificates.X509Certificate2]::new($certificate.Export([System.Security.Cryptography.X509Certificates.X509ContentType]::Cert))
+        $store.Add($publicCertificate)
+    } finally { $store.Close(); $rsa.Dispose() }
+    Write-Host 'Disposable public test certificate trusted successfully'
     "NODE_EXTRA_CA_CERTS=$(Join-Path $qaRoot 'qa-localhost.pem')" | Out-File $env:GITHUB_ENV -Encoding utf8 -Append
 } else { throw 'Specify preparation stage' }
