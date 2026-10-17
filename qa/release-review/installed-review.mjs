@@ -17,8 +17,13 @@ async function launch(){
  const env={...process.env};delete env.CHENGJING_PROFILE_DIR;
  application=await electron.launch({executablePath:exe,env,timeout:30000});
  const page=await application.firstWindow();await page.waitForFunction(()=>Boolean(window.chengjing));
- await page.waitForFunction(async()=>{const s=await window.chengjing.state();return Boolean(s.workspace&&s.license?.ready)});
- return {page,state:await page.evaluate(()=>window.chengjing.state())};
+ const end=Date.now()+20000;
+ while(Date.now()<end){
+  const state=await page.evaluate(()=>window.chengjing.state());
+  if(state.workspace&&state.license?.ready)return {page,state};
+  await new Promise(resolve=>setTimeout(resolve,100));
+ }
+ throw Error('Default profile/workspace initialization did not complete within 20 seconds');
 }
 async function close(){if(application){await application.close();application=null;}}
 function install(){
@@ -27,9 +32,9 @@ function install(){
 }
 try{
  assert.equal(process.platform,'win32');
- const signatures=spawnSync('powershell.exe',['-NoLogo','-NoProfile','-NonInteractive','-Command',"$ErrorActionPreference='Stop'; $items=@($env:QA_INSTALLER,$env:QA_EXE)|ForEach-Object{$s=Get-AuthenticodeSignature -LiteralPath $_; @{file=[IO.Path]::GetFileName($_);status=[string]$s.Status;hasSigningCertificate=($null -ne $s.SignerCertificate)}}; $items|ConvertTo-Json -Compress"],{encoding:'utf8',timeout:25000,env:{...process.env,QA_INSTALLER:installer}});
+ const signatures=spawnSync('pwsh.exe',['-NoLogo','-NoProfile','-NonInteractive','-Command',"$ErrorActionPreference='Stop'; $items=@($env:QA_INSTALLER,$env:QA_EXE)|ForEach-Object{$s=Get-AuthenticodeSignature -LiteralPath $_; @{file=[IO.Path]::GetFileName($_);status=[string]$s.Status;hasSigningCertificate=($null -ne $s.SignerCertificate)}}; $items|ConvertTo-Json -Compress"],{encoding:'utf8',timeout:25000,env:{...process.env,QA_INSTALLER:installer}});
  if(signatures.status===0)report.authenticode=JSON.parse(signatures.stdout.trim());else report.authenticodeInspectionError={exitCode:signatures.status,stderr:signatures.stderr};
- const registrations=spawnSync('powershell.exe',['-NoLogo','-NoProfile','-NonInteractive','-Command',"$ErrorActionPreference='Stop';$rows=@(); foreach($hive in @('HKCU','HKLM')){foreach($base in @('Software\\Microsoft\\Windows\\CurrentVersion\\Uninstall','Software\\WOW6432Node\\Microsoft\\Windows\\CurrentVersion\\Uninstall')){Get-ItemProperty \"${hive}:\\$base\\*\" -ErrorAction SilentlyContinue|Where-Object {$_.DisplayName -match '澄镜|Chengjing' -or $_.InstallLocation -eq $env:QA_INSTALLDIR}|ForEach-Object {$rows+=@{hive=$hive;displayName=$_.DisplayName;displayVersion=$_.DisplayVersion;publisher=$_.Publisher;hasUninstallCommand=([bool]$_.UninstallString)}}}};ConvertTo-Json -InputObject $rows -Compress"],{encoding:'utf8',timeout:25000,env:{...process.env,QA_INSTALLDIR:dir}});
+ const registrations=spawnSync('pwsh.exe',['-NoLogo','-NoProfile','-NonInteractive','-Command',"$ErrorActionPreference='Stop';$rows=@(); foreach($hive in @('HKCU','HKLM')){foreach($base in @('Software\\Microsoft\\Windows\\CurrentVersion\\Uninstall','Software\\WOW6432Node\\Microsoft\\Windows\\CurrentVersion\\Uninstall')){Get-ItemProperty \"${hive}:\\$base\\*\" -ErrorAction SilentlyContinue|Where-Object {$_.DisplayName -match '澄镜|Chengjing' -or $_.InstallLocation -eq $env:QA_INSTALLDIR}|ForEach-Object {$rows+=@{hive=$hive;displayName=$_.DisplayName;displayVersion=$_.DisplayVersion;publisher=$_.Publisher;hasUninstallCommand=([bool]$_.UninstallString)}}}};ConvertTo-Json -InputObject $rows -Compress"],{encoding:'utf8',timeout:25000,env:{...process.env,QA_INSTALLDIR:dir}});
  if(registrations.status===0)report.uninstallRegistration=JSON.parse(registrations.stdout.trim());else report.registrationInspectionError={exitCode:registrations.status,stderr:registrations.stderr};console.log('Metadata inspection completed; any inspection errors are recorded separately');
  const {state}=await launch();report.defaultProfileReady=true;assert(!state.license.authorized);assert.equal(await exists(path.join(profile,'license/license-v1.json')),true);mark('fresh launch creates a real default Windows profile and encrypted device identity');
  const deviceFile=path.join(profile,'license/license-v1.json'),deviceHash=await hash(deviceFile),sentinel=path.join(state.workspace,'qa-preserve-user-file.txt');
