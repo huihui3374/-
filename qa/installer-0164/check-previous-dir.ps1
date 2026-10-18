@@ -56,8 +56,8 @@ function StartSetup([string]$initial){
 }
 function CancelSetup($p){
  $w=Window;Click $w '^取消'
- $confirm=Until {@([InstallUI]::Windows()|Where-Object {$_.Pid -eq $w.Pid -and $_.Handle -ne $w.Handle -and $_.Enabled})|Select-Object -First 1}
- Click $confirm '^是'
+ $confirm=Until {@([InstallUI]::Windows()|Where-Object {$_.Pid -eq $w.Pid -and $_.Handle -ne $w.Handle -and $_.Enabled}|Where-Object {Button $_ '^(是|Yes)'})|Select-Object -First 1}
+ Click $confirm '^(是|Yes)'
  Assert ($p.WaitForExit(15000)) 'Cancelled installer did not exit'
 }
 
