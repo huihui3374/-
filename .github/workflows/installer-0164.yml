@@ -1,0 +1,44 @@
+name: Free Windows installer directory and upgrade review
+on:
+  push:
+    branches: [main]
+    paths: ['qa/installer-0164/**', '.github/workflows/installer-0164.yml']
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  installer:
+    if: github.event.repository.private == false
+    runs-on: windows-2025
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+      - name: Download pinned genuine installers
+        shell: pwsh
+        run: |
+          $root = Join-Path $env:RUNNER_TEMP 'chengjing-installer-0164'
+          New-Item -ItemType Directory -Path $root -Force | Out-Null
+          "QA_ROOT=$root" | Out-File $env:GITHUB_ENV -Encoding utf8 -Append
+          node qa/installer-0164/download.mjs qa/installer-0164/baseline.json "$root/baseline.exe"
+          if ($LASTEXITCODE -ne 0) { throw 'Baseline download failed' }
+          node qa/installer-0164/download.mjs qa/installer-0164/candidate.json "$root/candidate.exe"
+          if ($LASTEXITCODE -ne 0) { throw 'Candidate download failed' }
+      - name: Exercise visible installer directory page, cancellation and real installation
+        shell: pwsh
+        run: ./qa/installer-0164/installer-ui.ps1 -Installer "$env:QA_ROOT/candidate.exe" -Root $env:QA_ROOT
+      - name: Check previous directory, shortcuts, real old-version update, uninstall and data retention
+        shell: pwsh
+        run: node qa/installer-0164/lifecycle.mjs
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: installer-0164-proof
+          path: |
+            ${{ runner.temp }}/chengjing-installer-0164/*-proof.json
+            ${{ runner.temp }}/chengjing-installer-0164/*.log
+          retention-days: 14
