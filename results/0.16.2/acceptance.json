@@ -1,0 +1,163 @@
+{
+  "version": "0.16.2-retail.1",
+  "commit": "e300e3fcfd25017514df3a6a93713c2008db8611",
+  "installerSha256": "c4cd9ef5239127da316799a0be0aa41681046605f8bf55a43ccaeecb93059197",
+  "installerBytes": 116975307,
+  "coreLocalTestsPassed": 55,
+  "workflows": [
+    {
+      "url": "https://github.com/huihui3374/-/actions/runs/39101568751",
+      "conclusion": "success"
+    },
+    {
+      "url": "https://github.com/huihui3374/-/actions/runs/39101568769",
+      "conclusion": "success"
+    }
+  ],
+  "scope": "Standard free public GitHub Windows 2022/2025 VMs. Actual public EXE and MCP/Windows/Edge operations. Membership boundary tests use an isolated protocol simulator, not real customer accounts or live payment. In-app upgrade test installs actual 0.14 then bootstraps 0.16.2 and lowers only its package version on the disposable VM to exercise the real current updater against the real public package.",
+  "reports": [
+    {
+      "jobId": 117598733853,
+      "windows": "10.0.20348",
+      "host": "runnervmgnbhw",
+      "baseline": "0.14.0-retail.2",
+      "simulatedOlderVersion": "0.15.0-retail.1",
+      "updaterScenario": "Only the installed package version is lowered on this disposable VM; all updater code and real production downloads are unchanged",
+      "final": "0.16.2-retail.1",
+      "checks": [
+        "real 0.14 to new bootstrap installation preserves default encrypted device identity and user data",
+        "17 updater integrity, range, cancellation and version-order tests pass against the installed code on this Windows VM",
+        "customer interface hides technical fields, keeps permissions accessible and fits the desktop window",
+        "actual packaged UI checks newer release, downloads over HTTPS, reports progress and verifies the real installer",
+        "cancel in the native installation confirmation leaves current program and verified download available",
+        "verified installer runs after the old process exits and installs the expected version in the same directory",
+        "new version automatically opens a real desktop window after installation",
+        "successful upgrade removes its cached installer without deleting user data",
+        "upgraded program opens with the same encrypted identity, preferences and workspace files"
+      ],
+      "passed": true,
+      "realCustomerAccountsUsed": false,
+      "productionPaymentsMade": false,
+      "automaticRelaunch": true,
+      "defaultProfilePreserved": true
+    },
+    {
+      "jobId": 117598734013,
+      "windows": "10.0.26100",
+      "host": "runnervm0xl3a",
+      "baseline": "0.14.0-retail.2",
+      "simulatedOlderVersion": "0.15.0-retail.1",
+      "updaterScenario": "Only the installed package version is lowered on this disposable VM; all updater code and real production downloads are unchanged",
+      "final": "0.16.2-retail.1",
+      "checks": [
+        "real 0.14 to new bootstrap installation preserves default encrypted device identity and user data",
+        "17 updater integrity, range, cancellation and version-order tests pass against the installed code on this Windows VM",
+        "customer interface hides technical fields, keeps permissions accessible and fits the desktop window",
+        "actual packaged UI checks newer release, downloads over HTTPS, reports progress and verifies the real installer",
+        "cancel in the native installation confirmation leaves current program and verified download available",
+        "verified installer runs after the old process exits and installs the expected version in the same directory",
+        "new version automatically opens a real desktop window after installation",
+        "successful upgrade removes its cached installer without deleting user data",
+        "upgraded program opens with the same encrypted identity, preferences and workspace files"
+      ],
+      "passed": true,
+      "realCustomerAccountsUsed": false,
+      "productionPaymentsMade": false,
+      "automaticRelaunch": true,
+      "defaultProfilePreserved": true
+    },
+    {
+      "jobId": 117598734048,
+      "phase": "first",
+      "download": {
+        "publicInstaller": true,
+        "transport": "advertised HTTP byte ranges",
+        "bytes": 116975307,
+        "sha256": "c4cd9ef5239127da316799a0be0aa41681046605f8bf55a43ccaeecb93059197",
+        "elapsedMs": 14543
+      },
+      "installation": {
+        "installedInChinesePath": true,
+        "engine": "Inno Setup",
+        "exitCode": 0
+      },
+      "host": "runnervmgnbhw",
+      "windowsRelease": "10.0.20348",
+      "architecture": "x64",
+      "version": "0.16.2-retail.1",
+      "checks": [
+        "actual installer installs the reviewed production application source unchanged",
+        "pristine published executable, production service key and Windows DPAPI",
+        "clean packaged first launch, isolated renderer, 8-character password and no-member connection denial",
+        "client login and device binding against synthetic protocol simulator",
+        "client accepts initial seven-day lease and thirty-day renewal from simulator",
+        "real packaged MCP listener and bundled Cloudflare process start",
+        "MCP initialize, catalog, current instance, verification code and PowerShell identity",
+        "terminal denied before user grants permissions",
+        "approved file work persists; rejected work never executes",
+        "actual Windows command stdout and nonzero exit code read back",
+        "independent Edge browser opens, fills, clicks, persists session and screenshots",
+        "real public HTTPS tunnel MCP check",
+        "expired membership blocks new operations and an earlier approval cannot bypass expiry",
+        "disconnect stops local connection"
+      ],
+      "passed": true,
+      "realCustomersUsed": false,
+      "realPaymentsMade": false,
+      "productionConfigurationChanged": false,
+      "testLicenseService": "public disposable protocol simulator, NOT production backend",
+      "membershipPolicyProof": "reviewed production backend tested separately in private local environment",
+      "reviewedSourceFiles": 38,
+      "publicMcpReachable": true,
+      "screenshotSha256": "8b3399285d93dbb68992b08e2304c477de456a0e09b5d3d59246941c13d91ecd"
+    },
+    {
+      "jobId": 117598967506,
+      "phase": "second",
+      "download": {
+        "publicInstaller": true,
+        "transport": "advertised HTTP byte ranges",
+        "bytes": 116975307,
+        "sha256": "c4cd9ef5239127da316799a0be0aa41681046605f8bf55a43ccaeecb93059197",
+        "elapsedMs": 9448
+      },
+      "installation": {
+        "engine": "Inno Setup",
+        "installedInChinesePath": true,
+        "exitCode": 0
+      },
+      "host": "runnervm0xl3a",
+      "windowsRelease": "10.0.26100",
+      "architecture": "x64",
+      "version": "0.16.2-retail.1",
+      "checks": [
+        "actual installer installs the reviewed production application source unchanged",
+        "pristine published executable, production service key and Windows DPAPI",
+        "second independent Windows VM confirmed",
+        "clean packaged first launch, isolated renderer, 8-character password and no-member connection denial",
+        "copied first-PC DPAPI profile cannot decrypt on second PC",
+        "same account denied on second PC while first PC remains bound",
+        "client accepts authorized transfer against synthetic protocol simulator",
+        "client login and device binding against synthetic protocol simulator",
+        "real packaged MCP listener and bundled Cloudflare process start",
+        "MCP initialize, catalog, current instance, verification code and PowerShell identity",
+        "terminal denied before user grants permissions",
+        "approved file work persists; rejected work never executes",
+        "actual Windows command stdout and nonzero exit code read back",
+        "independent Edge browser opens, fills, clicks, persists session and screenshots",
+        "real public HTTPS tunnel MCP check",
+        "expired membership blocks new operations and an earlier approval cannot bypass expiry",
+        "disconnect stops local connection"
+      ],
+      "passed": true,
+      "realCustomersUsed": false,
+      "realPaymentsMade": false,
+      "productionConfigurationChanged": false,
+      "testLicenseService": "public disposable protocol simulator, NOT production backend",
+      "membershipPolicyProof": "reviewed production backend tested separately in private local environment",
+      "reviewedSourceFiles": 38,
+      "publicMcpReachable": true,
+      "screenshotSha256": "10b298ec8bb1c8fe4aa5bac60111559ba406961700591e439cefed46d10ea17c"
+    }
+  ]
+}

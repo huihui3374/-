@@ -1,12 +1,12 @@
-**Latest completed acceptance:** [both independent Windows machines passed](results/README.md), run [39073437328](https://github.com/huihui3374/-/actions/runs/39073437328).
+**Latest completed acceptance:** [0.16.2 passed on both independent Windows environments](results/0.16.2/README.md), including real in-app updates and automatic restart. Earlier 0.14 evidence remains in [the archive](results/README.md).
 
 # 澄镜 — free independent Windows acceptance
 
 This repository contains **only disposable public QA scripts**. It does not contain
 the merchant backend, merchant credentials, customer data or production signing keys.
 The current public EXE installer is downloaded from its existing public storefront URL using its advertised HTTP byte-range support, then reassembled and checked in full; the detected Inno/NSIS installer is actually run on the disposable VM. It is pinned to
-version `0.14.0-retail.2`, SHA-256
-`78d931935a54855f28d0f6b5507783ecd5b4bdd3ada740e65b6fc8e89a9fe9f2`.
+version `0.16.2-retail.1`, SHA-256
+`c4cd9ef5239127da316799a0be0aa41681046605f8bf55a43ccaeecb93059197`.
 
 ## Zero-cost configuration
 
@@ -39,10 +39,7 @@ are never trusted by the published app or production service. All accounts use
 `example.invalid`. This fixture is NOT a payment service or a replacement for
 production licensing, and is NOT proof of production server policy by itself.
 
-Production backend policy was checked separately against the actual recovered
-deployment source in private: 40 backend tests plus 3 cross-device integration
-tests; the published client's component suite passed 37 tests. These local tests
-do not establish Windows compatibility; Windows job results must be read separately.
+The earlier 0.14 backend policy was checked separately against its recovered source in private (40 backend and 3 cross-device tests). Current merchant backend changes are maintained separately. The current client component suite passed 55 local tests; Windows compatibility and actual update results are recorded separately above.
 
 Cloud Windows VMs do not cover every consumer Windows version, antivirus warning,
 home network, external AI frontend or deliberate editing of locally accessible JS.
