@@ -1,0 +1,31 @@
+{
+  "passed": true,
+  "version": "0.16.4-retail.1",
+  "checks": [
+    "real visible directory page and Browse button",
+    "custom Chinese and spaces directory accepted through visible input",
+    "cancelling before install leaves no executable",
+    "real GUI installation finishes at selected path with correct version",
+    "real Windows uninstall registration matches the selected directory and version",
+    "desktop and start-menu shortcuts are created by the normal installer",
+    "manual upgrade directory page stays visible and defaults to the previous selected path",
+    "uninstall removes application and shortcuts while preserving encrypted identity, settings and workspace",
+    "genuine 0.16.3 UI downloads and verifies the candidate installer over public HTTPS",
+    "native in-app update installs in the custom directory and automatically opens the new program",
+    "updated application opens with the same identity, preferences, workspace and membership store",
+    "uninstall and reinstall preserve the same user identity and settings"
+  ],
+  "actualGuiInstaller": true,
+  "metadataFixture": "none; real public application metadata, installer downloads and native updater",
+  "productionAccountsUsed": false,
+  "productionPaymentsMade": false,
+  "installDirectory": "D:\\a\\_temp\\chengjing-installer-0164\\中文 软件目录",
+  "workflow": "https://github.com/huihui3374/-/actions/runs/39121126418",
+  "jobId": 117656780442,
+  "qaCommit": "cb86cc5887a2b711efe52b5593605b0bb340308e",
+  "package": {
+    "bytes": 116976593,
+    "sha256": "59b97dc5ccd50ee98684f58a28544ea90997d4d01e68cc7dac38def0c4d326ca",
+    "downloadUrl": "/downloads/apps/819fba07-4574-4438-8d59-53e28de13c15/Chengjing-Retail-Setup-0.16.4-retail.1-x64.exe"
+  }
+}
