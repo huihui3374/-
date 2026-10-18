@@ -3,9 +3,9 @@ import fs from 'node:fs/promises';
 import {createReadStream} from 'node:fs';
 import {createHash} from 'node:crypto';
 import path from 'node:path';
-const [url,destination]=process.argv.slice(2),total=116975307,chunk=4*1024*1024;
+const [url,destination]=process.argv.slice(2),total=116976160,chunk=4*1024*1024;
 const parsed=new URL(url);
-if(parsed.origin!=='https://chengjingshop.top'||parsed.pathname!=='/downloads/apps/baa2f49d-5eb9-4cf9-ac08-0ebbd233561a/Chengjing-Retail-Setup-0.16.2-retail.1-x64.exe')throw Error('Unexpected public installer URL');
+if(parsed.origin!=='https://chengjingshop.top'||parsed.pathname!=='/downloads/apps/aa7d77e2-4536-4d0f-8b0e-b1118efc8cd1/Chengjing-Retail-Setup-0.16.3-retail.1-x64.exe')throw Error('Unexpected public installer URL');
 const started=Date.now();
 const handle=await fs.open(destination,'w+'),controller=new AbortController();
 const deadline=setTimeout(()=>controller.abort(new Error('Range download exceeded 180 seconds')),180000);
@@ -36,6 +36,6 @@ try{
 }catch(error){controller.abort();await Promise.allSettled(workers);throw error;}
 finally{clearTimeout(deadline);await handle.close();}
 const hash=createHash('sha256');for await(const part of createReadStream(destination))hash.update(part);
-if(hash.digest('hex')!=='c4cd9ef5239127da316799a0be0aa41681046605f8bf55a43ccaeecb93059197')throw Error('Reassembled public ZIP failed SHA-256 verification');
-await fs.writeFile(path.join(path.dirname(destination),'download-evidence.json'),JSON.stringify({publicInstaller:true,transport:'advertised HTTP byte ranges',bytes:total,sha256:'c4cd9ef5239127da316799a0be0aa41681046605f8bf55a43ccaeecb93059197',elapsedMs:Date.now()-started}));
+if(hash.digest('hex')!=='89b281c66a6387edebb287357eba534a13bb5886c455e19927ce6a8e2fd31eaa')throw Error('Reassembled public ZIP failed SHA-256 verification');
+await fs.writeFile(path.join(path.dirname(destination),'download-evidence.json'),JSON.stringify({publicInstaller:true,transport:'advertised HTTP byte ranges',bytes:total,sha256:'89b281c66a6387edebb287357eba534a13bb5886c455e19927ce6a8e2fd31eaa',elapsedMs:Date.now()-started}));
 console.log('All advertised byte ranges assembled; original release SHA-256 verified');

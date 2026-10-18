@@ -32,6 +32,14 @@ jobs:
         timeout-minutes: 3
         shell: pwsh
         run: ./qa/cross-pc/prepare.ps1 extract
+      - name: Run real membership and owned-process tests with installed source
+        shell: pwsh
+        run: |
+          $app = Join-Path (Split-Path $env:QA_EXE) 'resources/app'
+          New-Item -ItemType Directory -Path (Join-Path $app 'test') -Force | Out-Null
+          Copy-Item 'qa/cross-pc/client-tests/*.js' (Join-Path $app 'test')
+          node --test "$app/test/retail-license.test.js" "$app/test/retail-support.test.js" "$app/test/retail-gate.test.js"
+          if ($LASTEXITCODE -ne 0) { throw 'Installed-source membership tests failed' }
       - name: Prepare disposable localhost HTTPS certificate
         timeout-minutes: 1
         shell: pwsh
@@ -67,6 +75,14 @@ jobs:
         timeout-minutes: 3
         shell: pwsh
         run: ./qa/cross-pc/prepare.ps1 extract
+      - name: Run real membership and owned-process tests with installed source
+        shell: pwsh
+        run: |
+          $app = Join-Path (Split-Path $env:QA_EXE) 'resources/app'
+          New-Item -ItemType Directory -Path (Join-Path $app 'test') -Force | Out-Null
+          Copy-Item 'qa/cross-pc/client-tests/*.js' (Join-Path $app 'test')
+          node --test "$app/test/retail-license.test.js" "$app/test/retail-support.test.js" "$app/test/retail-gate.test.js"
+          if ($LASTEXITCODE -ne 0) { throw 'Installed-source membership tests failed' }
       - name: Prepare disposable localhost HTTPS certificate
         timeout-minutes: 1
         shell: pwsh

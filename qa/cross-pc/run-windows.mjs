@@ -15,7 +15,7 @@ const phase=process.argv[2],root=process.env.QA_ROOT,exe=process.env.QA_EXE,appR
 await fs.mkdir(out,{recursive:true});await fs.mkdir(workspace,{recursive:true});await fs.mkdir(handoff,{recursive:true});
 const download=JSON.parse(await fs.readFile(path.join(root,'download-evidence.json')));
 const installation=JSON.parse((await fs.readFile(path.join(root,'installation-evidence.json'),'utf8')).replace(/^\uFEFF/,''));
-const report={phase,download,installation,host:os.hostname(),windowsRelease:os.release(),architecture:os.arch(),version:'0.16.2-retail.1',checks:[],passed:false,realCustomersUsed:false,realPaymentsMade:false,productionConfigurationChanged:false,testLicenseService:'public disposable protocol simulator, NOT production backend',membershipPolicyProof:'reviewed production backend tested separately in private local environment'};
+const report={phase,download,installation,host:os.hostname(),windowsRelease:os.release(),architecture:os.arch(),version:'0.16.3-retail.1',checks:[],passed:false,realCustomersUsed:false,realPaymentsMade:false,productionConfigurationChanged:false,testLicenseService:'public disposable protocol simulator, NOT production backend',membershipPolicyProof:'reviewed production backend tested separately in private local environment'};
 const mark=name=>{report.checks.push(name);console.log('PASS '+name)};
 const clean=s=>String(s).replace(/https:\/\/[^\s"']*trycloudflare\.com[^\s"']*/g,'[private test connection]').replace(/\/mcp\/[A-Za-z0-9_-]+/g,'/mcp/[hidden]').replace(/Bearer\s+[A-Za-z0-9_-]+/g,'Bearer [hidden]');
 const save=()=>fs.writeFile(path.join(out,phase+'.json'),JSON.stringify(report,null,2));
@@ -74,8 +74,14 @@ try{
  if(phase==='first'){
   await fs.copyFile(path.join(profile,'license/license-v1.json'),path.join(handoff,'license-v1.json'));await fs.writeFile(path.join(handoff,'protocol-state.json'),JSON.stringify(fixture.exportState()));await fs.writeFile(path.join(handoff,'first-machine.json'),JSON.stringify({host:os.hostname(),windowsRelease:os.release(),deviceCount:1}));
  }
- const pending=data(await client.callTool({name:'write_file',arguments:{path:'blocked-after-expiry.txt',content:'must never execute'}}));assert.equal(pending.status,'awaiting_approval');fixture.expire();await page.evaluate(()=>window.chengjing.licenseRefresh().catch(()=>{}));await wait(s=>!s.license.authorized);await page.evaluate(id=>window.chengjing.decideJob(id,'once').catch(()=>{}),pending.job_id);await assert.rejects(fs.access(path.join(workspace,'blocked-after-expiry.txt')));assert.equal((await client.callTool({name:'read_file',arguments:{path:'approved.txt'}})).isError,true);mark('expired membership blocks new operations and an earlier approval cannot bypass expiry');
- await page.locator('#disconnect').click();await wait(s=>s.phase==='idle'&&!s.running);await page.screenshot({path:path.join(out,phase+'.png')});mark('disconnect stops local connection');
+ const background=await approved('start_process',{command:'[Console]::WriteLine($PID); Start-Sleep -Seconds 300'});
+ let ownedPid;for(let i=0;i<200;i++){const output=data(await client.callTool({name:'get_command_output',arguments:{command_id:background.result.id}}));const match=output.stdout.match(/^\s*(\d+)\s*$/m);if(match){ownedPid=Number(match[1]);break}assert(output.running,'Owned fixture process exited before expiry');await new Promise(r=>setTimeout(r,100))}assert(ownedPid>0,'Owned fixture PID missing');
+ const alive=()=>application.evaluate((_electron,pid)=>{try{process.kill(pid,0);return true}catch(e){if(e.code==='ESRCH')return false;throw e}},ownedPid);
+ assert(await alive());mark('real owned Windows background process running before expiry');
+ const pending=data(await client.callTool({name:'write_file',arguments:{path:'blocked-after-expiry.txt',content:'must never execute'}}));assert.equal(pending.status,'awaiting_approval');fixture.expire();await page.evaluate(()=>window.chengjing.licenseRefresh().catch(()=>{}));await wait(s=>!s.license.authorized&&s.phase==='idle'&&!s.running);
+ await assert.rejects(fs.access(path.join(workspace,'blocked-after-expiry.txt')));await assert.rejects(client.callTool({name:'read_file',arguments:{path:'approved.txt'}}));
+ let terminated=false;for(let i=0;i<100;i++){if(!await alive()){terminated=true;break}await new Promise(r=>setTimeout(r,100))}assert(terminated,'Expired membership left its process running');mark('expiry automatically closes MCP, cancels approvals and terminates the real owned Windows process');
+ await page.screenshot({path:path.join(out,phase+'.png')});mark('expired connection remains stopped until user reconnects after renewal');
  report.passed=true;
 }catch(e){report.failure=clean(e.stack||e.message);console.error(report.failure);process.exitCode=1}
 finally{

@@ -10,16 +10,16 @@ if ($Stage -eq 'download') {
     Write-Host 'Fetching live published application metadata (30 second timeout)'
     $release = (Invoke-RestMethod 'https://chengjingshop.top/api/applications' -Headers @{'User-Agent'='Chengjing-QA/1.0'} -TimeoutSec 30).applications | Where-Object { $_.id -eq 'chengjing-connect' }
     Write-Host ('Observed public release: ' + ($release | ConvertTo-Json -Depth 6 -Compress))
-    if ($release.version -ne '0.16.2-retail.1' -or $release.package.sha256 -ne 'c4cd9ef5239127da316799a0be0aa41681046605f8bf55a43ccaeecb93059197' -or $release.package.bytes -ne 116975307) { throw 'Published package changed; refresh the reviewed test input first' }
+    if ($release.version -ne '0.16.3-retail.1' -or $release.package.sha256 -ne '89b281c66a6387edebb287357eba534a13bb5886c455e19927ce6a8e2fd31eaa' -or $release.package.bytes -ne 116976160) { throw 'Published package changed; refresh the reviewed test input first' }
     Write-Host 'Metadata matched; fetching advertised HTTP ranges with bounded concurrency'
     $downloadUrl = [Uri]::new([Uri]'https://chengjingshop.top', [string]$release.downloadUrl).AbsoluteUri
     & node qa/cross-pc/range-download.mjs $downloadUrl $zip
     if ($LASTEXITCODE -ne 0) { throw 'Verified range download failed' }
-    if ((Get-Item $zip).Length -ne 116975307) { throw 'Published archive size mismatch' }
+    if ((Get-Item $zip).Length -ne 116976160) { throw 'Published archive size mismatch' }
     Write-Host 'Download completed'
 } elseif ($Stage -eq 'extract') {
     Write-Host 'Checking SHA-256 of downloaded archive'
-    if ((Get-FileHash $zip -Algorithm SHA256).Hash.ToLower() -ne 'c4cd9ef5239127da316799a0be0aa41681046605f8bf55a43ccaeecb93059197') { throw 'Published archive checksum mismatch' }
+    if ((Get-FileHash $zip -Algorithm SHA256).Hash.ToLower() -ne '89b281c66a6387edebb287357eba534a13bb5886c455e19927ce6a8e2fd31eaa') { throw 'Published archive checksum mismatch' }
     $extract = Join-Path $qaRoot '中文路径 with spaces'
     Write-Host ('Installer description: ' + (Get-Item $zip).VersionInfo.FileDescription)
     $binaryText = [System.Text.Encoding]::Latin1.GetString([System.IO.File]::ReadAllBytes($zip))
