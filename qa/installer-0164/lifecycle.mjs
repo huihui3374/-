@@ -12,7 +12,7 @@ const dir=ui.installDirectory,exe=path.join(dir,'Chengjing-Retail.exe'),appDir=p
 const require=createRequire(path.join(appDir,'package.json')),{_electron:electron}=require('playwright');
 const final=JSON.parse(await fs.readFile('qa/installer-0164/candidate.json','utf8'));
 const profile=path.join(process.env.APPDATA,'ChengjingRetail'),device=path.join(profile,'license/license-v1.json');
-const report={passed:false,version:final.version,checks:ui.checks.slice(),actualGuiInstaller:true,metadataFixture:'Only the /api/applications response is pinned to the candidate before publication; installer download uses the real public HTTPS URL and published SHA256',productionAccountsUsed:false,productionPaymentsMade:false};
+const report={passed:false,version:final.version,checks:ui.checks.slice(),actualGuiInstaller:true,metadataFixture:'none; real public application metadata, installer downloads and native updater',productionAccountsUsed:false,productionPaymentsMade:false};
 const mark=name=>{report.checks.push(name);console.log('PASS '+name)},delay=ms=>new Promise(r=>setTimeout(r,ms));
 const exists=p=>fs.access(p).then(()=>true,()=>false),hash=p=>fs.readFile(p).then(b=>createHash('sha256').update(b).digest('hex'));
 let app;
@@ -36,7 +36,7 @@ try{
  await uninstall();assert(await exists(device));assert(await exists(workFile));assert.equal(await hash(device),identity);assert.equal(await exists(path.join(desktop,shortcut)),false);assert.equal(await exists(path.join(programs,shortcut)),false);mark('uninstall removes application and shortcuts while preserving encrypted identity, settings and workspace');
  setup(path.join(root,'baseline.exe'));
  const previous=await launch();assert.equal((await previous.page.evaluate(()=>window.chengjing.supportState())).version,'0.16.3-retail.1');assert.equal(previous.state.workspace,workspace);assert.equal(await hash(device),identity);
- await app.evaluate(({net},release)=>{const original=net.fetch.bind(net);net.fetch=async(url,options)=>String(url)==='https://chengjingshop.top/api/applications'?{ok:true,json:async()=>({applications:[{id:'chengjing-connect',...release,package:{bytes:release.bytes,sha256:release.sha256}}]})}:original(url,options);},final);
+ const catalog=await (await fetch('https://chengjingshop.top/api/applications')).json();const published=catalog.applications.find(a=>a.id==='chengjing-connect');assert.equal(published.version,final.version);assert.equal(published.package.sha256,final.sha256);
  await previous.page.locator('#support-update').click();await until(async()=>(await previous.page.evaluate(()=>window.chengjing.supportState())).update.phase==='available');
  await previous.page.locator('#support-download').click();await until(async()=>{const s=(await previous.page.evaluate(()=>window.chengjing.supportState())).update;if(s.phase==='error')throw Error(s.error);return s.phase==='ready'},160000);mark('genuine 0.16.3 UI downloads and verifies the candidate installer over public HTTPS');
  await app.evaluate(({dialog})=>{dialog.showMessageBox=async()=>({response:1})});
