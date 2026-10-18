@@ -1,0 +1,49 @@
+name: Free Windows in-app upgrade acceptance
+on:
+  push:
+    branches: [main]
+    paths: ['qa/update-review/**', '.github/workflows/update-review.yml']
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  upgrade:
+    if: github.event.repository.private == false
+    strategy:
+      fail-fast: false
+      matrix:
+        windows: [windows-2022, windows-2025]
+    runs-on: ${{ matrix.windows }}
+    timeout-minutes: 12
+    env:
+      GITHUB_REPOSITORY_VISIBILITY: ${{ github.event.repository.visibility }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+      - name: Download pinned previous installer
+        shell: pwsh
+        run: |
+          $root = Join-Path $env:RUNNER_TEMP 'chengjing-cross-pc'
+          New-Item -ItemType Directory -Path $root -Force | Out-Null
+          "QA_ROOT=$root" | Out-File $env:GITHUB_ENV -Encoding utf8 -Append
+          node qa/update-review/download.mjs qa/update-review/baseline.json "$root/published-setup.exe"
+      - name: Install baseline into isolated Chinese and spaces path
+        shell: pwsh
+        run: |
+          $file = Join-Path $env:QA_ROOT 'published-setup.exe'
+          if ((Get-FileHash $file -Algorithm SHA256).Hash.ToLower() -ne '78d931935a54855f28d0f6b5507783ecd5b4bdd3ada740e65b6fc8e89a9fe9f2') { throw 'Old installer digest changed' }
+          $dest = Join-Path $env:QA_ROOT '中文路径 with spaces'
+          $p = Start-Process $file -ArgumentList "/VERYSILENT /SUPPRESSMSGBOXES /NORESTART /SP- /CURRENTUSER /DIR=`"$dest`"" -PassThru
+          [void]$p.Handle
+          if (-not $p.WaitForExit(90000) -or $p.ExitCode -ne 0) { throw 'Old installer failed' }
+          "QA_EXE=$(Join-Path $dest 'Chengjing-Retail.exe')" | Out-File $env:GITHUB_ENV -Encoding utf8 -Append
+      - name: Download and verify published bootstrap installer
+        shell: pwsh
+        run: node qa/update-review/download.mjs qa/update-review/final.json "$env:QA_ROOT/bootstrap.exe"
+      - name: Exercise actual UI, cancel, download, install, restart and data preservation
+        shell: pwsh
+        run: node qa/update-review/upgrade.mjs
