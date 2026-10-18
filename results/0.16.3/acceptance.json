@@ -1,0 +1,10 @@
+{
+  "version": "0.16.3-retail.1",
+  "sourceCommit": "83285f8",
+  "qaCommit": "10a3e945ca86b0ee675789f47ec403af14c7e1e5",
+  "workflow": "https://github.com/huihui3374/-/actions/runs/39116063663",
+  "conclusion": "success",
+  "coreLocalTestsPassed": 59,
+  "actualBackendClientIntegrationTestsPassed": 3,
+  "sharedBackendRegressionTestsPassed": 54
+}

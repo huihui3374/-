@@ -1,0 +1,50 @@
+{
+  "jobId": 117642213930,
+  "phase": "second",
+  "download": {
+    "publicInstaller": true,
+    "transport": "advertised HTTP byte ranges",
+    "bytes": 116976160,
+    "sha256": "89b281c66a6387edebb287357eba534a13bb5886c455e19927ce6a8e2fd31eaa",
+    "elapsedMs": 8622
+  },
+  "installation": {
+    "engine": "Inno Setup",
+    "installedInChinesePath": true,
+    "exitCode": 0
+  },
+  "host": "runnervm0xl3a",
+  "windowsRelease": "10.0.26100",
+  "architecture": "x64",
+  "version": "0.16.3-retail.1",
+  "checks": [
+    "actual installer installs the reviewed production application source unchanged",
+    "pristine published executable, production service key and Windows DPAPI",
+    "second independent Windows VM confirmed",
+    "clean packaged first launch, isolated renderer, 8-character password and no-member connection denial",
+    "copied first-PC DPAPI profile cannot decrypt on second PC",
+    "same account denied on second PC while first PC remains bound",
+    "client accepts authorized transfer against synthetic protocol simulator",
+    "client login and device binding against synthetic protocol simulator",
+    "real packaged MCP listener and bundled Cloudflare process start",
+    "MCP initialize, catalog, current instance, verification code and PowerShell identity",
+    "terminal denied before user grants permissions",
+    "approved file work persists; rejected work never executes",
+    "actual Windows command stdout and nonzero exit code read back",
+    "independent Edge browser opens, fills, clicks, persists session and screenshots",
+    "real public HTTPS tunnel MCP check",
+    "real owned Windows background process running before expiry",
+    "expiry automatically closes MCP, cancels approvals and terminates the real owned Windows process",
+    "expired connection remains stopped until user reconnects after renewal"
+  ],
+  "passed": true,
+  "realCustomersUsed": false,
+  "realPaymentsMade": false,
+  "productionConfigurationChanged": false,
+  "testLicenseService": "public disposable protocol simulator, NOT production backend",
+  "membershipPolicyProof": "reviewed production backend tested separately in private local environment",
+  "reviewedSourceFiles": 38,
+  "publicMcpReachable": true,
+  "screenshotSha256": "5e237b6e1b70b609256d3794a2f633300214b969e8f6da1dbeda8f9a6dbc2fa3",
+  "installedSourceMembershipTests": 14
+}

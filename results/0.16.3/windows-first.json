@@ -1,0 +1,47 @@
+{
+  "jobId": 117641981323,
+  "phase": "first",
+  "download": {
+    "publicInstaller": true,
+    "transport": "advertised HTTP byte ranges",
+    "bytes": 116976160,
+    "sha256": "89b281c66a6387edebb287357eba534a13bb5886c455e19927ce6a8e2fd31eaa",
+    "elapsedMs": 11686
+  },
+  "installation": {
+    "installedInChinesePath": true,
+    "engine": "Inno Setup",
+    "exitCode": 0
+  },
+  "host": "runnervmgnbhw",
+  "windowsRelease": "10.0.20348",
+  "architecture": "x64",
+  "version": "0.16.3-retail.1",
+  "checks": [
+    "actual installer installs the reviewed production application source unchanged",
+    "pristine published executable, production service key and Windows DPAPI",
+    "clean packaged first launch, isolated renderer, 8-character password and no-member connection denial",
+    "client login and device binding against synthetic protocol simulator",
+    "client accepts initial seven-day lease and thirty-day renewal from simulator",
+    "real packaged MCP listener and bundled Cloudflare process start",
+    "MCP initialize, catalog, current instance, verification code and PowerShell identity",
+    "terminal denied before user grants permissions",
+    "approved file work persists; rejected work never executes",
+    "actual Windows command stdout and nonzero exit code read back",
+    "independent Edge browser opens, fills, clicks, persists session and screenshots",
+    "real public HTTPS tunnel MCP check",
+    "real owned Windows background process running before expiry",
+    "expiry automatically closes MCP, cancels approvals and terminates the real owned Windows process",
+    "expired connection remains stopped until user reconnects after renewal"
+  ],
+  "passed": true,
+  "realCustomersUsed": false,
+  "realPaymentsMade": false,
+  "productionConfigurationChanged": false,
+  "testLicenseService": "public disposable protocol simulator, NOT production backend",
+  "membershipPolicyProof": "reviewed production backend tested separately in private local environment",
+  "reviewedSourceFiles": 38,
+  "publicMcpReachable": true,
+  "screenshotSha256": "6703c398d59062d8316726fbcabd49c4021fa6538203312062c541e5ec1adc6e",
+  "installedSourceMembershipTests": 14
+}
