@@ -33,6 +33,7 @@ jobs:
         run: ./qa/installer-0164/installer-ui.ps1 -Installer "$env:QA_ROOT/candidate.exe" -Root $env:QA_ROOT
       - name: Check previous directory, shortcuts, real old-version update, uninstall and data retention
         shell: pwsh
+        timeout-minutes: 7
         run: node qa/installer-0164/lifecycle.mjs
       - uses: actions/upload-artifact@v4
         if: always()
@@ -41,4 +42,5 @@ jobs:
           path: |
             ${{ runner.temp }}/chengjing-installer-0164/*-proof.json
             ${{ runner.temp }}/chengjing-installer-0164/*.log
+            ${{ runner.temp }}/chengjing-installer-0164/*.png
           retention-days: 14

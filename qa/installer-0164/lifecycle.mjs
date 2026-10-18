@@ -19,8 +19,16 @@ let app;
 function ps(command){const r=spawnSync('pwsh.exe',['-NoLogo','-NoProfile','-NonInteractive','-Command',command],{encoding:'utf8',timeout:30000,env:{...process.env,QA_EXE:exe,QA_INSTALLDIR:dir}});assert.equal(r.status,0,r.stderr);return r.stdout.trim();}
 function stopAutoLaunch(){ps("Get-Process -Name 'Chengjing-Retail' -ErrorAction SilentlyContinue|Where-Object {$_.Path -eq $env:QA_EXE}|Stop-Process -Force");}
 async function until(fn,timeout=30000){const end=Date.now()+timeout;while(Date.now()<end){const r=await fn();if(r)return r;await delay(200)}throw Error('Windows acceptance timeout');}
-async function launch(){const env={...process.env};delete env.CHENGJING_PROFILE_DIR;app=await electron.launch({executablePath:exe,env,timeout:30000});const page=await app.firstWindow();await page.waitForFunction(()=>Boolean(window.chengjing));const state=await until(async()=>{const s=await page.evaluate(()=>window.chengjing.state());return s.workspace&&s.license?.ready?s:false});return{page,state};}
-async function close(){if(app){await app.close();app=null;}}
+async function launch(){
+ const env={...process.env};delete env.CHENGJING_PROFILE_DIR;
+ app=await electron.launch({executablePath:exe,env,timeout:30000});
+ const diagnostics=[];app.process().stderr?.on('data',b=>diagnostics.push(b.toString().slice(-5000)));
+ const page=await app.firstWindow();page.on('console',m=>diagnostics.push('renderer: '+m.text()));page.on('pageerror',e=>diagnostics.push('pageerror: '+e.message));
+ try{await page.waitForFunction(()=>Boolean(window.chengjing),{},{timeout:20000});}
+ catch(e){report.startupDiagnostic={url:page.url(),body:await page.locator('body').innerText({timeout:3000}).catch(()=>''),logs:diagnostics.slice(-20),windows:app.windows().map(w=>w.url())};await page.screenshot({path:path.join(root,'startup-failure.png')}).catch(()=>{});throw e;}
+ const state=await until(async()=>{const s=await page.evaluate(()=>window.chengjing.state());return s.workspace&&s.license?.ready?s:false});return{page,state};
+}
+async function close(){if(app){const current=app;app=null;await Promise.race([current.close(),delay(12000).then(()=>{stopAutoLaunch();throw Error('QA close timed out; terminated only the disposable test executable')})]);}}
 function setup(file){const r=spawnSync(file,['/VERYSILENT','/SUPPRESSMSGBOXES','/NORESTART','/SP-','/CURRENTUSER','/DIR='+dir,'/LOG='+path.join(root,'lifecycle-'+Date.now()+'.log')],{encoding:'utf8',timeout:90000});assert.equal(r.status,0,r.stderr);}
 async function uninstall(){const name=(await fs.readdir(dir)).find(n=>/^unins\d+\.exe$/i.test(n));assert(name,'Windows uninstaller not created');const r=spawnSync(path.join(dir,name),['/VERYSILENT','/SUPPRESSMSGBOXES','/NORESTART'],{encoding:'utf8',timeout:90000});assert.equal(r.status,0,r.stderr);assert.equal(await exists(exe),false);}
 try{
@@ -48,5 +56,5 @@ try{
  const updated=await launch();assert.equal(updated.state.workspace,workspace);assert.equal((await updated.page.evaluate(()=>window.chengjing.supportState())).version,final.version);await close();mark('updated application opens with the same identity, preferences, workspace and membership store');
  await uninstall();setup(path.join(root,'candidate.exe'));const reinstalled=await launch();assert.equal(reinstalled.state.workspace,workspace);assert.equal(await hash(device),identity);await close();mark('uninstall and reinstall preserve the same user identity and settings');
  report.installDirectory=dir;report.passed=true;
-}catch(e){report.failure=String(e.stack||e);console.error(report.failure);process.exitCode=1;}
-finally{await close().catch(()=>{});await fs.writeFile(path.join(root,'lifecycle-proof.json'),JSON.stringify(report,null,2));console.log('INSTALLER_REPORT_BEGIN\n'+JSON.stringify(report,null,2)+'\nINSTALLER_REPORT_END');if(process.env.GITHUB_STEP_SUMMARY)await fs.appendFile(process.env.GITHUB_STEP_SUMMARY,'```json\n'+JSON.stringify(report,null,2)+'\n```\n');}
+}catch(e){report.failure=String(e.stack||e);console.error(report.failure);if(report.startupDiagnostic)console.error(JSON.stringify(report.startupDiagnostic));process.exitCode=1;}
+finally{await close().catch(()=>{});await fs.writeFile(path.join(root,'lifecycle-proof.json'),JSON.stringify(report,null,2));console.log('INSTALLER_REPORT_BEGIN\n'+JSON.stringify(report,null,2)+'\nINSTALLER_REPORT_END');if(process.env.GITHUB_STEP_SUMMARY)await fs.appendFile(process.env.GITHUB_STEP_SUMMARY,'```json\n'+JSON.stringify(report,null,2)+'\n```\n');process.exit(process.exitCode||0);}
