@@ -1,0 +1,25 @@
+name: Proxy isolated Windows TUN driver check
+on:
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: proxy-tun-qa-${{ github.ref }}
+  cancel-in-progress: false
+env:
+  GITHUB_REPOSITORY_VISIBILITY: ${{ github.event.repository.visibility }}
+jobs:
+  driver:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [windows-2022, windows-2025]
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with:
+          persist-credentials: false
+      - name: Verify pinned core, TUN routes and crash recovery
+        shell: pwsh
+        run: ./qa/proxy-tun-windows.ps1
