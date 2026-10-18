@@ -1,0 +1,54 @@
+{
+  "scope": "generic-isolated-windows-tun-driver",
+  "run": {
+    "id": 39126821016,
+    "status": "completed",
+    "conclusion": "success",
+    "head_sha": "001207b14b0dc44b442abc8c7c8f598499c0c7b8",
+    "event": "workflow_dispatch",
+    "html_url": "https://github.com/huihui3374/-/actions/runs/39126821016",
+    "created_at": "2026-10-18T12:19:47Z",
+    "updated_at": "2026-10-18T12:20:10Z"
+  },
+  "applicationUiValidated": false,
+  "publicExitValidated": false,
+  "customerDataUsed": false,
+  "systems": [
+    {
+      "name": "driver (windows-2022)",
+      "jobId": 117673589213,
+      "conclusion": "success",
+      "checks": {
+        "scope": "ephemeral-windows-tun-driver",
+        "coreIntegrity": true,
+        "startsDisabled": true,
+        "actualTun": true,
+        "ipv4Routes": true,
+        "ipv6Routes": true,
+        "gracefulRecovery": true,
+        "crashRecovery": true,
+        "originalProxyAndDnsPreserved": true,
+        "publicExitValidated": false,
+        "applicationUiValidated": false
+      }
+    },
+    {
+      "name": "driver (windows-2025)",
+      "jobId": 117673589386,
+      "conclusion": "success",
+      "checks": {
+        "scope": "ephemeral-windows-tun-driver",
+        "coreIntegrity": true,
+        "startsDisabled": true,
+        "actualTun": true,
+        "ipv4Routes": true,
+        "ipv6Routes": true,
+        "gracefulRecovery": true,
+        "crashRecovery": true,
+        "originalProxyAndDnsPreserved": true,
+        "publicExitValidated": false,
+        "applicationUiValidated": false
+      }
+    }
+  ]
+}
