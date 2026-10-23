@@ -1,3 +1,5 @@
+**软件下载与会员：** [澄镜本地连接 Windows 使用与购买指南](docs/windows-ai-connector-guide.zh-CN.md) · [安装包与套餐](https://chengjingshop.top/apps?utm_source=github&utm_medium=readme&utm_campaign=connect-20261023)。安装包免费，会员 ¥1/7天或 ¥3/30天；请先确认 AI 客户端的 HTTP 执行能力。
+
 **Latest completed acceptance:** [0.16.2 passed on both independent Windows environments](results/0.16.2/README.md), including real in-app updates and automatic restart. Earlier 0.14 evidence remains in [the archive](results/README.md).
 
 # 澄镜 — free independent Windows acceptance
